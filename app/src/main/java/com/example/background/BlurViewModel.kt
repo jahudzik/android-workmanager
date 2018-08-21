@@ -14,47 +14,34 @@
  * limitations under the License.
  */
 
-package com.example.background;
+package com.example.background
 
-import android.arch.lifecycle.ViewModel;
-import android.net.Uri;
-import android.text.TextUtils;
+import android.arch.lifecycle.ViewModel
+import android.net.Uri
+import android.text.TextUtils
 
-public class BlurViewModel extends ViewModel {
+class BlurViewModel : ViewModel() {
 
-    private Uri mImageUri;
-
-    public BlurViewModel() {
-    }
+    internal var imageUri: Uri? = null
+        private set
 
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
      *
      * @param blurLevel The amount to blur the image
      */
-    void applyBlur(int blurLevel) {
+    internal fun applyBlur(blurLevel: Int) {
 
     }
 
-    private Uri uriOrNull(String uriString) {
-        if (!TextUtils.isEmpty(uriString)) {
-            return Uri.parse(uriString);
-        }
-        return null;
+    private fun uriOrNull(uriString: String): Uri? {
+        return if (!TextUtils.isEmpty(uriString)) {
+            Uri.parse(uriString)
+        } else null
     }
 
-    /**
-     * Setters
-     */
-    void setImageUri(String uri) {
-        mImageUri = uriOrNull(uri);
-    }
-
-    /**
-     * Getters
-     */
-    Uri getImageUri() {
-        return mImageUri;
+    internal fun setImageUri(uri: String) {
+        imageUri = uriOrNull(uri)
     }
 
 }

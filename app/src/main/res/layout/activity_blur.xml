@@ -85,14 +85,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/cancel_button"
+                android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cancel_work"
                 android:visibility="gone" />
 
             <ProgressBar
-                android:id="@+id/progress_bar"
+                android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -100,13 +100,13 @@
                 android:visibility="gone" />
 
             <Button
-                android:id="@+id/go_button"
+                android:id="@+id/goButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/go" />
 
             <Button
-                android:id="@+id/see_file_button"
+                android:id="@+id/outputButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/see_file"
