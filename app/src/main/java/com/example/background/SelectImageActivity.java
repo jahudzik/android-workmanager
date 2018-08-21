@@ -44,7 +44,7 @@ public class SelectImageActivity extends AppCompatActivity {
     private static final String KEY_PERMISSIONS_REQUEST_COUNT = "KEY_PERMISSIONS_REQUEST_COUNT";
     private static final int MAX_NUMBER_REQUEST_PERMISSIONS = 2;
 
-    private static final List<String> sPermissions = Arrays.asList(
+    private static final List<String> REQUESTED_PERMISSIONS = Arrays.asList(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     );
@@ -57,8 +57,7 @@ public class SelectImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select);
 
         if (savedInstanceState != null) {
-            mPermissionRequestCount =
-                    savedInstanceState.getInt(KEY_PERMISSIONS_REQUEST_COUNT, 0);
+            mPermissionRequestCount = savedInstanceState.getInt(KEY_PERMISSIONS_REQUEST_COUNT, 0);
         }
 
         // Make sure the app has correct permissions to run
@@ -66,15 +65,14 @@ public class SelectImageActivity extends AppCompatActivity {
 
         // Create request to get image from filesystem when button clicked
         findViewById(R.id.selectImage).setOnClickListener(view -> {
-            Intent chooseIntent = new Intent(
-                    Intent.ACTION_PICK,
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            Intent chooseIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(chooseIntent, REQUEST_CODE_IMAGE);
         });
     }
 
-    /** Save the permission request count on a rotate **/
-
+    /**
+     * Save the permission request count on a rotate
+     **/
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -90,13 +88,9 @@ public class SelectImageActivity extends AppCompatActivity {
         if (!checkAllPermissions()) {
             if (mPermissionRequestCount < MAX_NUMBER_REQUEST_PERMISSIONS) {
                 mPermissionRequestCount += 1;
-                ActivityCompat.requestPermissions(
-                        this,
-                        sPermissions.toArray(new String[0]),
-                        REQUEST_CODE_PERMISSIONS);
+                ActivityCompat.requestPermissions(this, REQUESTED_PERMISSIONS.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
             } else {
-                Toast.makeText(this, R.string.set_permissions_in_settings,
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.set_permissions_in_settings, Toast.LENGTH_LONG).show();
                 findViewById(R.id.selectImage).setEnabled(false);
             }
         }
@@ -104,30 +98,26 @@ public class SelectImageActivity extends AppCompatActivity {
 
     private boolean checkAllPermissions() {
         boolean hasPermissions = true;
-        for (String permission : sPermissions) {
-            hasPermissions &=
-                    ContextCompat.checkSelfPermission(
-                            this, permission) == PackageManager.PERMISSION_GRANTED;
+        for (String permission : REQUESTED_PERMISSIONS) {
+            hasPermissions &= ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
         }
         return hasPermissions;
     }
 
-    /** Permission Checking **/
-
+    /**
+     * Permission Checking
+     **/
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode,
-            @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             requestPermissionsIfNecessary(); // no-op if permissions are granted already.
         }
     }
 
-    /** Image Selection **/
-
+    /**
+     * Image Selection
+     **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -144,15 +134,8 @@ public class SelectImageActivity extends AppCompatActivity {
     }
 
     private void handleImageRequestResult(Intent data) {
-        Uri imageUri = null;
-        if (data.getClipData() != null) {
-            imageUri = data.getClipData().getItemAt(0).getUri();
-        } else if (data.getData() != null) {
-            imageUri = data.getData();
-        }
-
+        Uri imageUri = getImageUri(data);
         if (imageUri == null) {
-            Log.e(TAG, "Invalid input image Uri.");
             return;
         }
 
@@ -160,4 +143,17 @@ public class SelectImageActivity extends AppCompatActivity {
         filterIntent.putExtra(Constants.KEY_IMAGE_URI, imageUri.toString());
         startActivity(filterIntent);
     }
+
+    @Nullable
+    private Uri getImageUri(Intent data) {
+        if (data.getClipData() != null) {
+            return data.getClipData().getItemAt(0).getUri();
+        } else if (data.getData() != null) {
+            return data.getData();
+        } else {
+            Log.e(TAG, "Invalid input image Uri.");
+            return null;
+        }
+    }
+
 }

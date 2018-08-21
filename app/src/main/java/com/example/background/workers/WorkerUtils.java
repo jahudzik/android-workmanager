@@ -46,11 +46,12 @@ import static com.example.background.Constants.DELAY_TIME_MILLIS;
 
 
 final class WorkerUtils {
+
     private static final String TAG = WorkerUtils.class.getSimpleName();
 
     /**
      * Create a Notification that is shown as a heads-up notification if possible.
-     *
+     * <p>
      * For this codelab, this is used to show a notification so that you know when different steps
      * of the background work chain are starting
      *
@@ -58,7 +59,11 @@ final class WorkerUtils {
      * @param context Context needed to create Toast
      */
     static void makeStatusNotification(String message, Context context) {
+        createNotificationChannel(context);
+        showNotification(message, context);
+    }
 
+    private static void createNotificationChannel(Context context) {
         // Make a channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create the NotificationChannel, but only on API 26+ because
@@ -66,19 +71,18 @@ final class WorkerUtils {
             CharSequence name = Constants.VERBOSE_NOTIFICATION_CHANNEL_NAME;
             String description = Constants.VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION;
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel =
-                    new NotificationChannel(Constants.CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(Constants.CHANNEL_ID, name, importance);
             channel.setDescription(description);
 
             // Add the channel
-            NotificationManager notificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
         }
+    }
 
+    private static void showNotification(String message, Context context) {
         // Create the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -104,27 +108,24 @@ final class WorkerUtils {
 
     /**
      * Blurs the given Bitmap image
-     * @param bitmap Image to blur
+     *
+     * @param bitmap             Image to blur
      * @param applicationContext Application context
      * @return Blurred bitmap image
      */
     @WorkerThread
     static Bitmap blurBitmap(@NonNull Bitmap bitmap,
                              @NonNull Context applicationContext) {
-
         RenderScript rsContext = null;
         try {
-
             // Create the output bitmap
-            Bitmap output = Bitmap.createBitmap(
-                    bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+            Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
 
             // Blur the image
             rsContext = RenderScript.create(applicationContext, RenderScript.ContextType.DEBUG);
             Allocation inAlloc = Allocation.createFromBitmap(rsContext, bitmap);
             Allocation outAlloc = Allocation.createTyped(rsContext, inAlloc.getType());
-            ScriptIntrinsicBlur theIntrinsic =
-                    ScriptIntrinsicBlur.create(rsContext, Element.U8_4(rsContext));
+            ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rsContext, Element.U8_4(rsContext));
             theIntrinsic.setRadius(10.f);
             theIntrinsic.setInput(inAlloc);
             theIntrinsic.forEach(outAlloc);
@@ -140,8 +141,9 @@ final class WorkerUtils {
 
     /**
      * Writes bitmap to a temporary file and returns the Uri for the file
+     *
      * @param applicationContext Application context
-     * @param bitmap Bitmap to write to temp file
+     * @param bitmap             Bitmap to write to temp file
      * @return Uri for temp file with bitmap
      * @throws FileNotFoundException Throws if bitmap file cannot be found
      */
@@ -172,4 +174,5 @@ final class WorkerUtils {
 
     private WorkerUtils() {
     }
+
 }

@@ -29,6 +29,7 @@ public class BlurViewModel extends ViewModel {
 
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
+     *
      * @param blurLevel The amount to blur the image
      */
     void applyBlur(int blurLevel) {

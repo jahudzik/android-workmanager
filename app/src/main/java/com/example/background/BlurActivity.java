@@ -42,25 +42,37 @@ public class BlurActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blur);
+        findViews();
+        initViewModel();
+        showImage();
+        setupButtons();
+    }
 
-        // Get the ViewModel
-        mViewModel = ViewModelProviders.of(this).get(BlurViewModel.class);
-
-        // Get all of the Views
+    private void findViews() {
         mImageView = findViewById(R.id.image_view);
         mProgressBar = findViewById(R.id.progress_bar);
         mGoButton = findViewById(R.id.go_button);
         mOutputButton = findViewById(R.id.see_file_button);
         mCancelButton = findViewById(R.id.cancel_button);
+    }
+
+    private void initViewModel() {
+        // Get the ViewModel
+        mViewModel = ViewModelProviders.of(this).get(BlurViewModel.class);
 
         // Image uri should be stored in the ViewModel; put it there then display
         Intent intent = getIntent();
         String imageUriExtra = intent.getStringExtra(Constants.KEY_IMAGE_URI);
         mViewModel.setImageUri(imageUriExtra);
+    }
+
+    private void showImage() {
         if (mViewModel.getImageUri() != null) {
             Glide.with(this).load(mViewModel.getImageUri()).into(mImageView);
         }
+    }
 
+    private void setupButtons() {
         // Setup blur image file button
         mGoButton.setOnClickListener(view -> mViewModel.applyBlur(getBlurLevel()));
     }
@@ -86,20 +98,21 @@ public class BlurActivity extends AppCompatActivity {
 
     /**
      * Get the blur level from the radio button as an integer
+     *
      * @return Integer representing the amount of times to blur the image
      */
     private int getBlurLevel() {
         RadioGroup radioGroup = findViewById(R.id.radio_blur_group);
 
-        switch(radioGroup.getCheckedRadioButtonId()) {
+        switch (radioGroup.getCheckedRadioButtonId()) {
             case R.id.radio_blur_lv_1:
                 return 1;
             case R.id.radio_blur_lv_2:
                 return 2;
             case R.id.radio_blur_lv_3:
                 return 3;
+            default:
+                return 1;
         }
-
-        return 1;
     }
 }
