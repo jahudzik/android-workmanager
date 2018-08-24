@@ -3,6 +3,7 @@ package com.example.background.workers
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.work.Data
 import androidx.work.Worker
 import com.example.background.Constants
 
@@ -17,8 +18,11 @@ class BlurWorker : Worker() {
             }
             val picture = BitmapFactory.decodeStream(applicationContext.contentResolver.openInputStream(Uri.parse(resourceUri)))
             val blurredPicture = WorkerUtils.blurBitmap(picture, applicationContext)
-            val uri = WorkerUtils.writeBitmapToFile(applicationContext, blurredPicture)
-            WorkerUtils.makeStatusNotification("Output is $uri", applicationContext)
+            val outputUri = WorkerUtils.writeBitmapToFile(applicationContext, blurredPicture)
+            WorkerUtils.makeStatusNotification("Output is $outputUri", applicationContext)
+            outputData = Data.Builder()
+                    .putString(Constants.KEY_IMAGE_URI, outputUri.toString())
+                    .build()
             return Result.SUCCESS
         } catch (throwable: Throwable) {
             Log.e("BlurWorker", "Error applying blur", throwable)
