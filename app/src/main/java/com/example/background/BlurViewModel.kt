@@ -54,6 +54,10 @@ class BlurViewModel : ViewModel() {
                 .enqueue()
     }
 
+    fun cancelWork() {
+        workManager.cancelUniqueWork(Constants.IMAGE_MANIPULATION_WORK_NAME)
+    }
+
     private fun uriOrNull(uriString: String): Uri? {
         return if (!TextUtils.isEmpty(uriString)) {
             Uri.parse(uriString)

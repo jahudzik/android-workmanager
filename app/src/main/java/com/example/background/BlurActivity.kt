@@ -101,6 +101,7 @@ class BlurActivity : AppCompatActivity() {
                 }
             }
         }
+        cancelButton.setOnClickListener { mViewModel?.cancelWork() }
     }
 
     /**
