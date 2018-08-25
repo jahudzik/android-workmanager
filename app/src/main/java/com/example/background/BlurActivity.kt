@@ -19,6 +19,7 @@ package com.example.background
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -65,12 +66,22 @@ class BlurActivity : AppCompatActivity() {
             if (workStatuses == null || workStatuses.isEmpty()) {
                 return@Observer
             }
-            if (workStatuses[0].state.isFinished) {
+            val workStatus = workStatuses[0]
+            if (workStatus.state.isFinished) {
                 showWorkFinished()
+                showOutputButton(workStatus)
             } else {
                 showWorkInProgress()
             }
         })
+    }
+
+    private fun showOutputButton(workStatus: WorkStatus) {
+        val imageUri = workStatus.outputData.getString(Constants.KEY_IMAGE_URI)
+        if (imageUri != null && imageUri.isNotEmpty()) {
+            outputButton.visibility = View.VISIBLE
+            mViewModel?.setImageUri(imageUri)
+        }
     }
 
     private fun showImage() {
@@ -82,6 +93,14 @@ class BlurActivity : AppCompatActivity() {
     private fun setupButtons() {
         // Setup blur image file button
         goButton.setOnClickListener { mViewModel?.applyBlur(blurLevel) }
+        outputButton.setOnClickListener {
+            mViewModel?.imageUri?.let {
+                val viewIntent = Intent(Intent.ACTION_VIEW, it)
+                if (viewIntent.resolveActivity(packageManager) != null) {
+                    startActivity(viewIntent)
+                }
+            }
+        }
     }
 
     /**
