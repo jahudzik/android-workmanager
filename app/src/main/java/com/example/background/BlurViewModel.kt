@@ -19,10 +19,7 @@ package com.example.background
 import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.text.TextUtils
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import com.example.background.workers.BlurWorker
 import com.example.background.workers.CleanupWorker
 import com.example.background.workers.SaveImageToFileWorker
@@ -40,11 +37,16 @@ class BlurViewModel : ViewModel() {
      * @param blurLevel The amount to blur the image
      */
     internal fun applyBlur(blurLevel: Int) {
+        val chargingConstraint = Constraints.Builder()
+                .setRequiresCharging(true)
+                .build()
+
         val cleanupRequest = OneTimeWorkRequest.from(CleanupWorker::class.java)
         val blurRequest = OneTimeWorkRequest.Builder(BlurWorker::class.java)
                 .setInputData(createInputDataForUri())
                 .build()
         val saveImageRequest = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java)
+                .setConstraints(chargingConstraint)
                 .addTag(Constants.TAG_OUTPUT)
                 .build()
         workManager
