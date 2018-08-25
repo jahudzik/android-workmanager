@@ -20,6 +20,7 @@ import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.text.TextUtils
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.example.background.workers.BlurWorker
@@ -44,7 +45,7 @@ class BlurViewModel : ViewModel() {
                 .build()
         val saveImageRequest = OneTimeWorkRequest.from(SaveImageToFileWorker::class.java)
         workManager
-                .beginWith(cleanupRequest)
+                .beginUniqueWork(Constants.IMAGE_MANIPULATION_WORK_NAME, ExistingWorkPolicy.REPLACE, cleanupRequest)
                 .then(blurRequest)
                 .then(saveImageRequest)
                 .enqueue()
