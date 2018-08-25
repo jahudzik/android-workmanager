@@ -17,11 +17,13 @@
 package com.example.background
 
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.RadioGroup
+import androidx.work.WorkStatus
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_blur.*
 
@@ -58,6 +60,17 @@ class BlurActivity : AppCompatActivity() {
         val intent = intent
         val imageUriExtra = intent.getStringExtra(Constants.KEY_IMAGE_URI)
         mViewModel?.setImageUri(imageUriExtra)
+
+        mViewModel?.workStatus?.observe(this, Observer<List<WorkStatus>> { workStatuses ->
+            if (workStatuses == null || workStatuses.isEmpty()) {
+                return@Observer
+            }
+            if (workStatuses[0].state.isFinished) {
+                showWorkFinished()
+            } else {
+                showWorkInProgress()
+            }
+        })
     }
 
     private fun showImage() {

@@ -32,6 +32,7 @@ class BlurViewModel : ViewModel() {
     internal var imageUri: Uri? = null
         private set
     private val workManager = WorkManager.getInstance()
+    val workStatus = workManager.getStatusesByTag(Constants.TAG_OUTPUT)
 
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
@@ -43,7 +44,9 @@ class BlurViewModel : ViewModel() {
         val blurRequest = OneTimeWorkRequest.Builder(BlurWorker::class.java)
                 .setInputData(createInputDataForUri())
                 .build()
-        val saveImageRequest = OneTimeWorkRequest.from(SaveImageToFileWorker::class.java)
+        val saveImageRequest = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java)
+                .addTag(Constants.TAG_OUTPUT)
+                .build()
         workManager
                 .beginUniqueWork(Constants.IMAGE_MANIPULATION_WORK_NAME, ExistingWorkPolicy.REPLACE, cleanupRequest)
                 .then(blurRequest)
